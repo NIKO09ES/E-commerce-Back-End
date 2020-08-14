@@ -6,7 +6,16 @@ const { Category, Product } = require('../../models');
 router.get('/', (req, res) => {
   // find all categories
   Category.findAll({
-    attributes: { exclude: ['password'] }
+    attributes: [
+      'id',
+      'category_name'
+    ],
+    include: [
+      {
+        model: Product,
+        attributes: ['id', 'product_name', 'price', 'stock', 'category_id'],
+      },
+    ]
   })
     .then(dbCategoryData => res.json(dbCategoryData))
     .catch(err => {
@@ -19,12 +28,20 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   // find one category by its `id` value
   Category.findOne({
-    attributes: { exclude: ['password'] },
     where: {
       id: req.params.id
-    }
-  })
-    .then(dbCategoryData => {
+    },
+    attributes: [
+      'id',
+      'category_name'
+    ],
+    include: [
+      {
+        model: Product,
+        attributes: ['id', 'product_name', 'price', 'stock', 'category_id'],
+      },
+    ]
+  }).then(dbCategoryData => {
       if (!dbCategoryData) {
         res.status(404).json({ message: 'No category found with this id' });
         return;

@@ -5,37 +5,20 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 
 // get all products
 router.get('/', (req, res) => {
-  // find all products
   Product.findAll({
-    //Query configuration
-    attributes: [
-      'id',
-      'product_name',
-      'price',
-      'stock',
-      'category_id'
-    ],
     include: [
-      {
-        model: Category,
-        attributes: ['id', 'category_name'],
-        include: {
-          model: Tag,
-          attributes: ['id, tag_name']
-        }
-      },
+      Category,
       {
         model: Tag,
-        attributes: ['id, tag_name']
+        through: ProductTag
       }
     ]
   })
-    .then(dbProductData => res.json(dbProductData))
+    .then(products => res.json(products))
     .catch(err => {
       console.log(err);
       res.status(500).json(err);
     });
-  // be sure to include its associated Category and Tag data
 });
 
 // get one product
@@ -46,26 +29,13 @@ router.get('/:id', (req, res) => {
     where: {
       id: req.params.id
     },
-    attributes: [
-      'id',
-      'product_name',
-      'price',
-      'stock',
-      'category_id'
-    ],
     include: [
-      {
-        model: Category,
-        attributes: ['id', 'category_name'],
-        include: {
-          model: Tag,
-          attributes: ['id, tag_name']
-        }
-      },
+      Category,
       {
         model: Tag,
-        attributes: ['id, tag_name']
-      }
+        through: ProductTag
+
+      },
     ]
   }).then((dbProductData) => {
     if (!dbProductData) {
